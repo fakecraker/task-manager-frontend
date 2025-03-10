@@ -1,14 +1,17 @@
 const TaskItem = ({ task, onUpdate, onDelete }) => {
-    return (
-      <li>
-        <span>{task.title}</span>
-        <button onClick={() => onUpdate(task.id, { ...task, completed: !task.completed })}>
-          {task.completed ? "Undo" : "Complete"}
-        </button>
+  return (
+    <tr>
+      <td>⭐</td> 
+      <td>{task.title}</td>
+      <td>{task.description}</td>
+      <td>{task.completed ? "✅ Done" : "❌ Pending"}</td>
+      <td>
+        <button onClick={() => onUpdate(task)}>Update</button>
         <button onClick={() => onDelete(task.id)}>Delete</button>
-      </li>
-    );
-  };
-  
-  export default TaskItem;
-  
+      </td>
+    </tr>
+  );
+};
+
+export default TaskItem;
+

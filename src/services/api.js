@@ -1,10 +1,26 @@
 import axios from "axios";
+import keycloak from "../keycloak"; 
 
-// Base API URL
 const API_URL = "http://localhost:8081/tasks";
 
-// Function to get tasks
-export const getTasks = async (token) => {
+
+const getAuthToken = async () => {
+  if (!keycloak.token) return null;
+  
+  try {
+    await keycloak.updateToken(30); 
+    return keycloak.token;
+  } catch (error) {
+    console.error("Token refresh failed", error);
+    return null;
+  }
+};
+
+// API requests
+export const getTasks = async () => {
+  const token = await getAuthToken();
+  if (!token) throw new Error("User not authenticated");
+
   try {
     const response = await axios.get(API_URL, {
       headers: { Authorization: `Bearer ${token}` },
@@ -16,8 +32,12 @@ export const getTasks = async (token) => {
   }
 };
 
+
 // Function to add a new task
-export const addTask = async (task, token) => {
+export const addTask = async (task) => {
+  const token = await getAuthToken();
+  if (!token) throw new Error("User not authenticated");
+
   try {
     const response = await axios.post(API_URL, task, {
       headers: { Authorization: `Bearer ${token}` },
@@ -30,7 +50,10 @@ export const addTask = async (task, token) => {
 };
 
 // Function to update a task
-export const updateTask = async (taskId, updatedTask, token) => {
+export const updateTask = async (taskId, updatedTask) => {
+  const token = await getAuthToken();
+  if (!token) throw new Error("User not authenticated");
+
   try {
     const response = await axios.put(`${API_URL}/${taskId}`, updatedTask, {
       headers: { Authorization: `Bearer ${token}` },
@@ -43,7 +66,10 @@ export const updateTask = async (taskId, updatedTask, token) => {
 };
 
 // Function to delete a task
-export const deleteTask = async (taskId, token) => {
+export const deleteTask = async (taskId) => {
+  const token = await getAuthToken();
+  if (!token) throw new Error("User not authenticated");
+
   try {
     await axios.delete(`${API_URL}/${taskId}`, {
       headers: { Authorization: `Bearer ${token}` },
